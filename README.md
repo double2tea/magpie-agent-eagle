@@ -10,7 +10,8 @@ restores the Eagle provider and defaults that the bridge replaced.
 
 > macOS · Eagle AI 模型套件 1.0.0 · Magpie tested with 0.1.3734
 >
-> v0.3.2: live vision dropdown and five consecutive Eagle cold restarts passed.
+> v0.3.3 automatically refreshes the vision catalog after connecting.
+> In v0.3.2, live vision dropdown and five consecutive Eagle cold restarts passed.
 > Targeted startup recovery restored the saved vision model in every round.
 > See [ACCEPTANCE.md](ACCEPTANCE.md) for test scope and remaining limitations.
 
@@ -32,8 +33,8 @@ restores the Eagle provider and defaults that the bridge replaced.
 
 ## 第一步：安装 Eagle 配套插件
 
-1. 打开 [v0.3.2 下载页](https://github.com/double2tea/magpie-agent-eagle/releases/tag/v0.3.2)。
-2. 下载 `Eagle-Magpie-Bridge-0.3.2.eagleplugin`，双击文件并按 Eagle 提示完成安装。
+1. 打开 [v0.3.3 下载页](https://github.com/double2tea/magpie-agent-eagle/releases/tag/v0.3.3)。
+2. 下载 `Eagle-Magpie-Bridge-0.3.3.eagleplugin`，双击文件并按 Eagle 提示完成安装。
 3. 从 Eagle 顶部菜单 **插件 → Magpie 桥接** 打开面板。
    此时显示“等待 Magpie”是正常的，继续下一步即可。
 
@@ -41,8 +42,8 @@ restores the Eagle provider and defaults that the bridge replaced.
 
 | 文件 | 用途 |
 | --- | --- |
-| `Eagle-Magpie-Bridge-0.3.2.eagleplugin` | 安装到 Eagle，必需 |
-| `magpie-agent-eagle-0.3.2.tgz` | Magpie 插件包；按下面的 GitHub 安装方式操作时，无需另外下载 |
+| `Eagle-Magpie-Bridge-0.3.3.eagleplugin` | 安装到 Eagle，必需 |
+| `magpie-agent-eagle-0.3.3.tgz` | Magpie 插件包；按下面的 GitHub 安装方式操作时，无需另外下载 |
 | `SHA256SUMS.txt` | 两个安装包的 SHA-256 校验值，可选 |
 | `Source code` | 开发用源码，普通安装无需下载 |
 
@@ -68,8 +69,8 @@ magpie plugin add github:double2tea/magpie-agent-eagle
 
 1. 在 **Magpie → Agents → Eagle** 选择语言模型。
 2. 回到 **Eagle → 插件 → Magpie 桥接**，等待显示 **“已连接 Magpie”**。
-3. 等待视觉模型列表加载。当前仓库版本在连接成功后会自动刷新列表；
-   已发布的 v0.3.2 若先打开面板、后连接 Magpie，需点击一次 **“重新同步”**。
+3. 等待视觉模型列表加载。v0.3.3 在连接成功后会自动刷新列表；
+   如果仍使用 v0.3.2，先打开面板、后连接 Magpie 时需点击一次 **“重新同步”**。
 4. 在同一面板的 **视觉模型** 下拉框选择支持图片的模型，或选择 **“跟随语言模型”**。
    选择后自动应用，不需要手填模型名或额外保存。
 5. 确认面板上方显示的语言模型、视觉模型与自己的选择一致。仅 Magpie 显示连接成功，
@@ -137,15 +138,15 @@ Eagle 面板的 **“恢复原配置并暂停”** 只暂停本次插件运行�
 
 1. On the same Mac, run Eagle and Magpie. Enable Eagle's official AI model suite
    1.0.0 and set both language and vision defaults before connecting.
-2. Download `Eagle-Magpie-Bridge-0.3.2.eagleplugin` from
-   [Releases](https://github.com/double2tea/magpie-agent-eagle/releases/tag/v0.3.2),
+2. Download `Eagle-Magpie-Bridge-0.3.3.eagleplugin` from
+   [Releases](https://github.com/double2tea/magpie-agent-eagle/releases/tag/v0.3.3),
    install it in Eagle, then open **Plugins → Magpie 桥接**.
 3. Add this repository on Magpie's plugins page, or run
    `magpie plugin add github:double2tea/magpie-agent-eagle`.
 4. Select the language model at **Magpie → Agents → Eagle**. Select the vision
    model in the **Eagle bridge's vision dropdown**, or choose to follow language.
-   Current source refreshes the dropdown automatically on connection. In the
-   published v0.3.2, click **重新同步** (re-sync) if the panel was opened before connecting.
+   v0.3.3 refreshes the dropdown automatically on connection. In v0.3.2,
+   click **重新同步** (re-sync) if the panel was opened before connecting.
 5. Confirm the Eagle bridge shows connected and both expected models.
    While connected, change models in those two locations; editing the managed
    OpenAI-compatible provider or defaults in Eagle's official settings can
@@ -203,8 +204,8 @@ python3 build.py
 
 Build outputs:
 
-- `dist/Eagle-Magpie-Bridge-0.3.2.eagleplugin` — Eagle companion runtime
-- `dist/magpie-agent-eagle-0.3.2.tgz` — Magpie agent plugin package
+- `dist/Eagle-Magpie-Bridge-0.3.3.eagleplugin` — Eagle companion runtime
+- `dist/magpie-agent-eagle-0.3.3.tgz` — Magpie agent plugin package
 
 SDK tests load the separately installed
 `~/Library/Application Support/Eagle/Plugins/ai-sdk/ai-sdk.cjs`, but use temporary

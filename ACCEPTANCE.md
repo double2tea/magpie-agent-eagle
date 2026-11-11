@@ -1,4 +1,4 @@
-# Acceptance — 0.3.2
+# Acceptance — 0.3.3
 
 Recorded on 2026-11-11 (Asia/Shanghai).
 
@@ -6,13 +6,15 @@ Recorded on 2026-11-11 (Asia/Shanghai).
 
 - Magpie 0.1.3734 loads the local agent plugin; the Eagle entry and model picker
   were visible on its Agents page.
-- 16 automated tests pass, with zero skips on a Mac with Eagle AI model suite
+- 17 automated tests pass, with zero skips on a Mac with Eagle AI model suite
   1.0.0 installed. Tests use temporary configurations and a local model endpoint.
 - Tests cover connection, switching, separate vision selection, following the
   language model, restart, restore, unrelated providers, manual changes, gateway
   failure, corrupt vision config on disconnect and paused edits.
 - Simulated panel tests cover reloading a failed catalog, showing an unavailable
-  saved model and disabling the selector while paused.
+  saved model and disabling the selector while paused. The 0.3.3 regression test
+  starts idle, then connects and verifies automatic catalog loading without
+  re-sync; repeated connected reports do not reload it.
 - An earlier live check using Node.js and the installed official Eagle SDK
   verified separate defaults, keeping vision when language changes, and restoring
   original provider settings/defaults. It did not upload media or run inference.
@@ -30,7 +32,7 @@ Recorded on 2026-11-11 (Asia/Shanghai).
 - Configuration writes wait for SDK microtasks to flush. After apply/restore,
   the bridge refreshes the official service cache and verifies both defaults.
   A stale official readback fails validation instead of reporting connected.
-- Five additional consecutive full Eagle process restarts passed without
+- In v0.3.2, five additional consecutive full Eagle process restarts passed without
   clicking re-sync or changing settings. Each round verified the official
   HTTP defaults and a fresh SDK disk read before opening the bridge panel.
   The panel then showed connected, the saved dropdown selection and successful
