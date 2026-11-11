@@ -1,0 +1,23 @@
+{
+  "id": "zeezhi-magpie-bridge",
+  "version": "0.3.1",
+  "platform": "mac",
+  "arch": "all",
+  "name": "Magpie 桥接",
+  "description": "接收 Magpie 的语言与视觉模型，管理 Eagle AI 模型套件并恢复原设置。",
+  "logo": "/logo.png",
+  "keywords": ["Magpie", "AI", "模型"],
+  "dependencies": ["ai-sdk"],
+  "devTools": false,
+  "main": {
+    "serviceMode": true,
+    "url": "index.html",
+    "width": 620,
+    "height": 620,
+    "minWidth": 480,
+    "minHeight": 450,
+    "resizable": true,
+    "multiple": false,
+    "frame": true
+  }
+}

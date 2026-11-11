@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src http://127.0.0.1:* http://localhost:*; style-src 'self'; script-src 'self' 'unsafe-inline'; img-src 'self' data:">
+  <title>Magpie 桥接</title>
+  <link rel="stylesheet" href="panel.css">
+</head>
+<body>
+  <main>
+    <header><img src="logo.png" alt=""><div><h1>Eagle × Magpie</h1><p>模型在 Magpie 选择，配置在这里生效。</p></div></header>
+    <section aria-label="连接状态">
+      <div class="status-line"><span id="indicator"></span><h2 id="state">正在连接 Eagle</h2></div>
+      <p id="message" role="status">正在读取模型配置。</p>
+      <dl><div><dt>语言模型</dt><dd id="chat">—</dd></div><div><dt>视觉模型</dt><dd id="image">—</dd></div></dl>
+    </section>
+    <section class="vision" aria-label="视觉模型">
+      <h2>视觉模型</h2>
+      <p>语言模型在 Magpie 的「Eagle」条目选择。这里只列出 Magpie 中支持图片的模型；未选择时跟随语言模型。</p>
+      <select id="vision" aria-label="视觉模型"></select>
+      <p id="vision-hint" role="status"></p>
+    </section>
+    <div class="actions"><button id="sync" type="button">重新同步</button><button id="settings" type="button">Eagle 模型设置</button></div>
+    <footer><p>在 Magpie 的 Agents 页面找到 Eagle 选择语言模型；视觉模型在上方从 Magpie 的模型列表选择。断开连接后，自动恢复原配置。</p><button id="restore" type="button" disabled>恢复原配置并暂停</button></footer>
+  </main>
+  <script>
+    const { fileURLToPath } = require("node:url");
+    require(fileURLToPath(new URL("panel.js", location.href)));
+  </script>
+</body>
+</html>
