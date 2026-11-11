@@ -1,6 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const crypto = require("node:crypto");
+const { setImmediate: flushSdk } = require("node:timers/promises");
 
 const PROVIDER = "openai-compatible";
 
@@ -90,7 +91,7 @@ function same(left, right) {
   return JSON.stringify(left) === JSON.stringify(right);
 }
 
-function createBridge({ ai, createSdk, directory, onStatus = () => {} }) {
+function createBridge({ ai, createSdk, directory, refreshHost = async () => {}, onStatus = () => {} }) {
   for (const method of ["reload", "exportConfig", "importConfig", "setDefaultModel"]) {
     if (typeof ai[method] !== "function") throw new Error("Eagle AI 模型套件版本不兼容。");
   }
@@ -134,7 +135,7 @@ function createBridge({ ai, createSdk, directory, onStatus = () => {} }) {
       for (const provider of scratch.getProviders()) {
         if (provider.name !== PROVIDER) provider.removeConfig();
       }
-      await Promise.resolve();
+      await flushSdk();
       scratch.exportConfig(backupFile);
       fs.chmodSync(backupFile, 0o600);
     } finally {
@@ -157,7 +158,7 @@ function createBridge({ ai, createSdk, directory, onStatus = () => {} }) {
   async function restore() {
     if (!state) return;
     ai.reload();
-    await Promise.resolve();
+    await flushSdk();
     assertOwned();
     state.phase = "restoring";
     saveJson(stateFile, state);
@@ -169,22 +170,39 @@ function createBridge({ ai, createSdk, directory, onStatus = () => {} }) {
     }
     ai.setDefaultModel("chat", state.before.chat);
     ai.setDefaultModel("image", state.before.image);
-    await Promise.resolve();
+    await flushSdk();
     ai.reload();
-    await Promise.resolve();
+    await flushSdk();
     if (!same(fingerprint(ai), state.before)) throw new Error("原配置恢复校验失败，已保留加密备份。");
+    await refreshHost(state.before);
     fs.unlinkSync(stateFile);
     fs.unlinkSync(backupFile);
     state = null;
     report("idle", "已恢复连接前的 Eagle 模型配置。");
   }
 
-  async function apply(desired) {
+  async function apply(desired, startup) {
     ai.reload();
-    await Promise.resolve();
-    if (state) assertOwned();
+    await flushSdk();
     const signature = crypto.createHash("sha256").update(JSON.stringify(desired)).digest("hex");
+    if (state && startup && state.phase === "connected" && state.signature === signature) {
+      const actual = fingerprint(ai);
+      if (state.expected.image !== state.expected.chat &&
+        actual.image === state.expected.chat &&
+        same({ ...actual, image: state.expected.image }, state.expected)) {
+        ai.setDefaultModel("image", state.expected.image);
+        await flushSdk();
+        ai.reload();
+        await flushSdk();
+        assertOwned();
+        await refreshHost(state.expected);
+        report("connected", "已恢复启动时被重置的视觉模型。");
+        return;
+      }
+    }
+    if (state) assertOwned();
     if (state?.phase === "connected" && state.signature === signature) {
+      await refreshHost(state.expected);
       report("connected", "已由 Magpie 管理语言和视觉模型。");
       return;
     }
@@ -197,20 +215,21 @@ function createBridge({ ai, createSdk, directory, onStatus = () => {} }) {
       provider.setCustomModels([...new Set([...state.before.customModels, desired.chat, desired.vision])]);
       ai.setDefaultModel("chat", `${PROVIDER}::${desired.chat}`);
       ai.setDefaultModel("image", `${PROVIDER}::${desired.vision}`);
-      await Promise.resolve();
+      await flushSdk();
       ai.reload();
-      await Promise.resolve();
+      await flushSdk();
       const actual = fingerprint(ai);
       if (actual.baseURL !== desired.baseURL ||
         actual.chat !== `${PROVIDER}::${desired.chat}` ||
         actual.image !== `${PROVIDER}::${desired.vision}`) {
         throw new Error("模型配置读回不一致。");
       }
+      await refreshHost(actual);
       state = { ...state, phase: "connected", signature, expected: actual };
       saveJson(stateFile, state);
       report("connected", "已由 Magpie 管理语言和视觉模型。");
     } catch {
-      await Promise.resolve();
+      await flushSdk();
       state.phase = "failed";
       state.expected = fingerprint(ai);
       saveJson(stateFile, state);
@@ -218,7 +237,7 @@ function createBridge({ ai, createSdk, directory, onStatus = () => {} }) {
     }
   }
 
-  async function sync(force = false) {
+  async function sync(force = false, startup = false) {
     if (running || stopped) return;
     running = true;
     try {
@@ -240,7 +259,7 @@ function createBridge({ ai, createSdk, directory, onStatus = () => {} }) {
       }
       desired.chat = desired.model;
       desired.vision = vision?.model ?? desired.model;
-      await apply(desired);
+      await apply(desired, startup);
     } catch (error) {
       const known = error instanceof Error && !/Unexpected|JSON|position|token/iu.test(error.message);
       report("error", known ? error.message : "Magpie 配置文件尚未写完整，请点击重新同步。");
@@ -256,6 +275,9 @@ function createBridge({ ai, createSdk, directory, onStatus = () => {} }) {
       if (stopped) throw new Error("同步已暂停，请先点击重新同步。");
       if (running) throw new Error("正在同步，请稍后重试。");
       if (!readConnection(connectionFile)) throw new Error("请先在 Magpie 的 Eagle 条目选择语言模型。");
+      ai.reload();
+      await flushSdk();
+      if (state) assertOwned();
       writeVision(directory, model);
       lastVision = undefined;
       await sync(true);
@@ -280,7 +302,7 @@ function createBridge({ ai, createSdk, directory, onStatus = () => {} }) {
     },
     start() {
       if (timer) return;
-      void sync(true);
+      void sync(true, true);
       timer = setInterval(() => void sync(), 1000);
     },
     stop() {

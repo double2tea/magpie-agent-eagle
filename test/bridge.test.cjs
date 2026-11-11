@@ -223,11 +223,62 @@ test("manual settings changes stop automatic restore without overwriting the use
   await bridge.sync(true);
   ai.setDefaultModel("chat", "tongyi::manually-chosen");
   await Promise.resolve();
+  await assert.rejects(() => bridge.setVision("group/other"), /其他操作修改/);
+  assert.equal(fs.existsSync(path.join(directory, "vision.json")), false);
   write({});
   await bridge.sync(true);
   assert.equal(bridge.getStatus().phase, "error");
   assert.equal(ai.getDefaultModel("chat"), "tongyi::manually-chosen");
   assert.equal(fs.existsSync(path.join(directory, "provider.eac")), true);
+});
+
+test("startup repairs only the matching vision reset and preserves other conflicts", { skip: !createSdk }, async context => {
+  const { ai, bridge, write } = await fixture(context);
+  write();
+  await bridge.setVision("group/vision");
+  ai.setDefaultModel("image", "openai-compatible::group/test");
+  await new Promise(resolve => setImmediate(resolve));
+  await bridge.sync(true, true);
+  assert.equal(bridge.getStatus().phase, "connected");
+  assert.equal(ai.getDefaultModel("image"), "openai-compatible::group/vision");
+  ai.setDefaultModel("image", "openai-compatible::group/test");
+  await new Promise(resolve => setImmediate(resolve));
+  await bridge.sync(true);
+  assert.equal(bridge.getStatus().phase, "error");
+  assert.equal(ai.getDefaultModel("image"), "openai-compatible::group/test");
+  ai.setDefaultModel("chat", "tongyi::manual");
+  await new Promise(resolve => setImmediate(resolve));
+  await bridge.sync(true, true);
+  assert.equal(bridge.getStatus().phase, "error");
+  assert.equal(ai.getDefaultModel("chat"), "tongyi::manual");
+});
+
+test("refreshes the official host cache after apply and restore", { skip: !createSdk }, async context => {
+  const { ai, bridge, write, directory } = await fixture(context);
+  bridge.stop();
+  const stale = createSdk({ configPath: path.join(directory, "../real-sdk.bin") });
+  const refreshed = createBridge({
+    ai, createSdk, directory,
+    refreshHost: async () => { stale.reload(); await Promise.resolve(); },
+  });
+  try {
+    write();
+    await refreshed.setVision("group/vision");
+    assert.equal(stale.getDefaultModel("image"), "openai-compatible::group/vision");
+    stale.getProvider("openai-compatible").setCustomModels(["group/test", "group/vision", "original-custom"]);
+    await Promise.resolve();
+    ai.reload();
+    await Promise.resolve();
+    assert.equal(ai.getDefaultModel("image"), "openai-compatible::group/vision");
+    stale.getProvider("openai-compatible").setCustomModels(["original-custom", "group/test", "group/vision"]);
+    await Promise.resolve();
+    write({});
+    await refreshed.sync(true);
+    assert.equal(refreshed.getStatus().phase, "idle");
+    assert.equal(stale.getDefaultModel("image"), "tongyi::original-image");
+  } finally {
+    refreshed.stop();
+  }
 });
 
 test("unrelated provider changes survive disconnect", { skip: !createSdk }, async context => {

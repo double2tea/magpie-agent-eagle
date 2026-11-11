@@ -1,5 +1,6 @@
 const path = require("node:path");
 const { createBridge } = require("./bridge.cjs");
+const { waitForHost, refreshHost } = require("./host.cjs");
 
 let bridge;
 let paused = false;
@@ -19,22 +20,26 @@ function paint(status) {
   if (status.phase === "paused") document.getElementById("vision").disabled = true;
 }
 
-eagle.onPluginCreate(() => {
+async function initialize() {
   try {
+    await waitForHost();
     const sdkPath = path.join(eagle.app.userDataPath, "Plugins", "ai-sdk", "ai-sdk.cjs");
     const createSdk = require(sdkPath).default;
     bridge = createBridge({
       ai: createSdk({ configPath: path.join(eagle.app.userDataPath, "Plugins", "ai-sdk", "config.bin") }),
       createSdk,
       directory: path.join(eagle.app.userDataPath, "MagpieBridge"),
+      refreshHost,
       onStatus: paint,
     });
     bridge.start();
     void loadVisionModels();
-  } catch {
-    paint({ phase: "error", message: "桥接无法启动，请确认 AI 模型套件 1.0.0 已启用，并重新打开插件。" });
+  } catch (error) {
+    paint({ phase: "error", message: `桥接无法启动：${error.message}` });
   }
-});
+}
+
+eagle.onPluginCreate(initialize);
 
 async function loadVisionModels() {
   const select = document.getElementById("vision");
@@ -75,7 +80,10 @@ document.getElementById("vision").addEventListener("change", async event => {
 });
 
 document.getElementById("sync").addEventListener("click", async () => {
-  if (!bridge) return;
+  if (!bridge) {
+    await initialize();
+    return;
+  }
   if (paused) {
     location.reload();
     return;

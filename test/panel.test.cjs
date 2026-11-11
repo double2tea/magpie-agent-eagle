@@ -38,6 +38,7 @@ function panel() {
     require: name => {
       if (name === "node:path") return path;
       if (name === "./bridge.cjs") return { createBridge: () => bridge };
+      if (name === "./host.cjs") return { waitForHost: async () => {}, refreshHost: async () => {} };
       return { default: () => ({}) };
     },
     eagle: {

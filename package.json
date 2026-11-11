@@ -1,6 +1,6 @@
 {
   "name": "magpie-agent-eagle",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Magpie agent plugin and companion Eagle bridge for language and vision model configuration.",
   "license": "MIT",
   "author": "ZEEZHI",
