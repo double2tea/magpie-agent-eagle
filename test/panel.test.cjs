@@ -11,10 +11,11 @@ function panel(initialPhase = "connected") {
   let attempts = 0;
   let fail = true;
   let onStatus;
+  let syncArguments;
   const bridge = {
     start() { onStatus(status); },
     stop() {},
-    sync: async () => { onStatus(status); return status; },
+    sync: async (...args) => { syncArguments = args; onStatus(status); return status; },
     restore: async () => {},
     getStatus: () => status,
     listVisionModels: async () => {
@@ -54,6 +55,7 @@ function panel(initialPhase = "connected") {
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, "../eagle/panel.js"), "utf8"), context);
   return {
     element, handlers, start: () => onCreate(), recover: () => { fail = false; }, attempts: () => attempts,
+    syncArguments: () => syncArguments,
     report: phase => onStatus({ ...status, phase }),
   };
 }
@@ -66,6 +68,7 @@ test("resync reloads a previously failed catalog and keeps an unavailable curren
   assert.equal(view.element("vision-hint").textContent, "网关不可达");
   view.recover();
   await view.handlers["sync:click"]();
+  assert.deepEqual(view.syncArguments(), [true, true]);
   assert.equal(view.attempts(), 2);
   assert.equal(view.element("vision").disabled, false);
   assert.equal(view.element("vision").value, "group/old");

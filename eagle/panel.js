@@ -91,7 +91,7 @@ document.getElementById("sync").addEventListener("click", async () => {
     location.reload();
     return;
   }
-  await bridge.sync(true);
+  await bridge.sync(true, true);
   await loadVisionModels();
 });
 

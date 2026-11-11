@@ -1,6 +1,6 @@
 {
   "id": "zeezhi-magpie-bridge",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "platform": "mac",
   "arch": "all",
   "name": "magpie-agent-eagle",
@@ -12,8 +12,8 @@
   "main": {
     "serviceMode": true,
     "url": "index.html",
-    "width": 620,
-    "height": 620,
+    "width": 720,
+    "height": 740,
     "minWidth": 480,
     "minHeight": 450,
     "resizable": true,

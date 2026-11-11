@@ -6,6 +6,7 @@ export const agent = {
   format: "json",
   model: "model",
   ua: ["eagle", "magpie-eagle"],
+  icon: "https://raw.githubusercontent.com/double2tea/magpie-agent-eagle/main/eagle/logo.png",
   notice: "这里选择 Eagle 的语言模型；视觉模型在 Eagle「magpie-agent-eagle」面板中从 Magpie 的模型列表选择，须支持图片。断开后恢复原配置。",
 };
 

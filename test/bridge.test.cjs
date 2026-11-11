@@ -56,6 +56,7 @@ test("agent contract loads without Node APIs and keeps credentials under one con
   const { agent, connect } = await import("../eagle.agent.js");
   assert.equal(agent.id, "eagle");
   assert.equal(agent.model, "model");
+  assert.equal(agent.icon, "https://raw.githubusercontent.com/double2tea/magpie-agent-eagle/main/eagle/logo.png");
   const result = connect({ gateway: { v1: "http://127.0.0.1:3425/v1", key: "test-only" }, model: "group/test" });
   assert.deepEqual(Object.keys(result), ["connection"]);
   assert.equal(result.connection.version, 1);
