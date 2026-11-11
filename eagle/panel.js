@@ -6,6 +6,7 @@ let bridge;
 let paused = false;
 
 function paint(status) {
+  const previousPhase = document.body.dataset.phase;
   document.body.dataset.phase = status.phase;
   document.getElementById("state").textContent = {
     idle: "等待 Magpie",
@@ -18,6 +19,9 @@ function paint(status) {
   document.getElementById("image").textContent = status.image || "未设置";
   document.getElementById("restore").disabled = !status.canRestore;
   if (status.phase === "paused") document.getElementById("vision").disabled = true;
+  if (status.phase === "connected" && previousPhase !== "connected") {
+    void loadVisionModels();
+  }
 }
 
 async function initialize() {
@@ -33,7 +37,6 @@ async function initialize() {
       onStatus: paint,
     });
     bridge.start();
-    void loadVisionModels();
   } catch (error) {
     paint({ phase: "error", message: `桥接无法启动：${error.message}` });
   }

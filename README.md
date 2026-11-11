@@ -20,10 +20,15 @@ restores the Eagle provider and defaults that the bridge replaced.
 当前验证环境为 Eagle AI 模型套件 1.0.0、Magpie 0.1.3734。
 
 1. 在 Eagle 安装并启用官方「AI 模型套件」。
-2. 打开 Eagle **偏好设置 → AI 模型套件**，确认语言模型和视觉模型都已有默认值。
+2. 打开 Eagle **偏好设置 → AI 模型套件**。如果是全新安装，先添加一个可用的模型服务商，
+   填好该服务需要的地址和密钥，再分别选择语言和视觉默认模型。
+   已有配置的用户只需确认两个默认值都不为空。
    桥接会记录这些设置，供断开时恢复；任意一项为空都会阻止首次连接。
 3. 在 Magpie 配好准备使用的模型服务。要选择独立视觉模型，Magpie 的模型目录中
    需要有标记为支持图片输入的模型。
+
+普通安装不需要克隆源码、安装 Node.js、Python 或执行开发构建命令；
+后面的“开发”章节仅供修改插件源码时使用。
 
 ## 第一步：安装 Eagle 配套插件
 
@@ -57,15 +62,21 @@ magpie plugin add github:double2tea/magpie-agent-eagle
 
 完成后打开 Magpie 的 **Agents** 页面，找到 **Eagle** 条目。
 两端插件都要安装：只装 Eagle 插件会一直等待连接，只装 Magpie 插件无法把配置应用到 Eagle。
+如果找不到 Eagle，先在 Magpie 插件页确认此插件已经安装并启用，再重新打开 Agents 页面。
 
 ## 第三步：连接并选择模型
 
 1. 在 **Magpie → Agents → Eagle** 选择语言模型。
 2. 回到 **Eagle → 插件 → Magpie 桥接**，等待显示 **“已连接 Magpie”**。
-3. 在同一面板的 **视觉模型** 下拉框选择支持图片的模型，或选择 **“跟随语言模型”**。
+3. 等待视觉模型列表加载。当前仓库版本在连接成功后会自动刷新列表；
+   已发布的 v0.3.2 若先打开面板、后连接 Magpie，需点击一次 **“重新同步”**。
+4. 在同一面板的 **视觉模型** 下拉框选择支持图片的模型，或选择 **“跟随语言模型”**。
    选择后自动应用，不需要手填模型名或额外保存。
-4. 确认面板上方显示的语言模型、视觉模型与自己的选择一致。仅 Magpie 显示连接成功，
+5. 确认面板上方显示的语言模型、视觉模型与自己的选择一致。仅 Magpie 显示连接成功，
    不代表 Eagle 已经应用配置，**以 Eagle 桥接面板为准**。
+
+首次未保存独立视觉选择时，视觉默认跟随语言模型。若语言模型不支持图片，
+请完成第 4 步后再使用 Eagle 的图片 AI 功能。
 
 例如：在 Magpie 选择 `group/expert`，在 Eagle 桥接下拉框选择 `group/multimodal`，
 就分别作为 Eagle 的语言和视觉默认模型。这两个名称仅为示例，以自己的 Magpie 模型列表为准。
@@ -89,6 +100,16 @@ magpie plugin add github:double2tea/magpie-agent-eagle
 Magpie 中只有一个 Eagle Agent 条目，视觉选择在 Eagle 桥接面板中完成。
 正常连接后，关闭桥接窗口仍会后台同步；重新启动 Eagle 会自动启动桥接服务。
 
+## 怎样确认装好了？
+
+- Magpie 的 Agents 页面能找到 Eagle，并能选择语言模型。
+- Eagle 桥接显示“已连接 Magpie”，上方两个模型与选择一致，视觉下拉框可用。
+- 完整退出并重新启动 Eagle 后，不点击“重新同步”，打开桥接面板仍显示连接成功和预期模型。
+
+以上确认的是配置与自动连接。若还要确认模型能实际处理图片，请在自己使用的 Eagle AI 插件中，
+用一张允许发送给所选模型服务的测试图片发起一次任务；这可能上传图片并产生上游服务费用。
+桥接自身不会自动发起推理，也不会自动安装其他 AI 功能插件。
+
 ## 断开、恢复与卸载
 
 1. 在 **Magpie → Agents → Eagle** 断开连接。
@@ -105,6 +126,7 @@ Eagle 面板的 **“恢复原配置并暂停”** 只暂停本次插件运行�
 | 现象 | 检查与处理 |
 | --- | --- |
 | 一直显示“等待 Magpie” | 确认两端插件均已安装，并已在 Magpie 的 Eagle 条目选择语言模型 |
+| Magpie 的 Agents 页面找不到 Eagle | 确认已安装并启用 Magpie 端插件，且 Eagle 配套插件已安装，再重新打开 Agents 页面 |
 | 提示官方 AI 模型套件未就绪 | 在 Eagle 启用官方「AI 模型套件」，待其启动后点击“重新同步” |
 | 提示缺少原语言或视觉默认模型 | 首次连接前，先在官方「AI 模型套件」设置好两个默认值，再重新同步 |
 | 视觉下拉框为空或读取失败 | 确认 Magpie 正在运行，模型目录包含支持图片输入的模型，再点击“重新同步”刷新列表 |
@@ -122,6 +144,8 @@ Eagle 面板的 **“恢复原配置并暂停”** 只暂停本次插件运行�
    `magpie plugin add github:double2tea/magpie-agent-eagle`.
 4. Select the language model at **Magpie → Agents → Eagle**. Select the vision
    model in the **Eagle bridge's vision dropdown**, or choose to follow language.
+   Current source refreshes the dropdown automatically on connection. In the
+   published v0.3.2, click **重新同步** (re-sync) if the panel was opened before connecting.
 5. Confirm the Eagle bridge shows connected and both expected models.
    While connected, change models in those two locations; editing the managed
    OpenAI-compatible provider or defaults in Eagle's official settings can

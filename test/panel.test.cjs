@@ -4,16 +4,17 @@ const path = require("node:path");
 const vm = require("node:vm");
 const { test } = require("node:test");
 
-function panel() {
+function panel(initialPhase = "connected") {
   const elements = new Map();
   const handlers = {};
-  const status = { phase: "connected", chat: "group/text", image: "group/old", canRestore: true };
+  const status = { phase: initialPhase, chat: "group/text", image: "group/old", canRestore: true };
   let attempts = 0;
   let fail = true;
+  let onStatus;
   const bridge = {
-    start() {},
+    start() { onStatus(status); },
     stop() {},
-    sync: async () => status,
+    sync: async () => { onStatus(status); return status; },
     restore: async () => {},
     getStatus: () => status,
     listVisionModels: async () => {
@@ -37,7 +38,7 @@ function panel() {
   const context = {
     require: name => {
       if (name === "node:path") return path;
-      if (name === "./bridge.cjs") return { createBridge: () => bridge };
+      if (name === "./bridge.cjs") return { createBridge: options => { onStatus = options.onStatus; return bridge; } };
       if (name === "./host.cjs") return { waitForHost: async () => {}, refreshHost: async () => {} };
       return { default: () => ({}) };
     },
@@ -51,7 +52,10 @@ function panel() {
     location: { reload() {} },
   };
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, "../eagle/panel.js"), "utf8"), context);
-  return { element, handlers, start: () => onCreate(), recover: () => { fail = false; }, attempts: () => attempts };
+  return {
+    element, handlers, start: () => onCreate(), recover: () => { fail = false; }, attempts: () => attempts,
+    report: phase => onStatus({ ...status, phase }),
+  };
 }
 
 test("resync reloads a previously failed catalog and keeps an unavailable current model visible", async () => {
@@ -78,4 +82,17 @@ test("restoring and pausing disables the visual model selector", async () => {
   await view.handlers["restore:click"]();
   assert.equal(view.element("vision").disabled, true);
   assert.equal(view.element("state").textContent, "已暂停同步");
+});
+
+test("connecting after opening the panel automatically refreshes the vision catalog", async () => {
+  const view = panel("idle");
+  await view.start();
+  assert.equal(view.attempts(), 0);
+  view.recover();
+  view.report("connected");
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(view.attempts(), 1);
+  assert.equal(view.element("vision").disabled, false);
+  view.report("connected");
+  assert.equal(view.attempts(), 1);
 });
