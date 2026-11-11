@@ -18,7 +18,7 @@ restores the Eagle provider and defaults that the bridge replaced.
 
 1. 在 Eagle 安装并启用「AI 模型套件」1.0.0，先设置语言和视觉默认模型，以便桥接记录和恢复它们。
 2. 从 [Releases](https://github.com/double2tea/magpie-agent-eagle/releases)
-   下载 `Magpie桥接-0.3.1.eagleplugin`，在 Eagle 安装并打开「Magpie 桥接」。
+   下载 `Eagle-Magpie-Bridge-0.3.1.eagleplugin`，在 Eagle 安装并打开「Magpie 桥接」。
 3. 在 Magpie 的插件页添加 GitHub 地址，或运行：
 
    ```sh
@@ -86,7 +86,7 @@ python3 build.py
 
 Build outputs:
 
-- `dist/Magpie桥接-0.3.1.eagleplugin` — Eagle companion runtime
+- `dist/Eagle-Magpie-Bridge-0.3.1.eagleplugin` — Eagle companion runtime
 - `dist/magpie-agent-eagle-0.3.1.tgz` — Magpie agent plugin package
 
 SDK tests load the separately installed
