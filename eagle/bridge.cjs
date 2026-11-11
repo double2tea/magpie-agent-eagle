@@ -45,7 +45,7 @@ function writeVision(directory, model) {
 
 async function listVisionModels(connectionFile, visionFile) {
   const connection = readConnection(connectionFile);
-  if (!connection) throw new Error("请先在 Magpie 的 Eagle 条目选择语言模型。");
+  if (!connection) throw new Error("请先在 Magpie 的 magpie-agent-eagle 条目选择语言模型。");
   const response = await fetch(`${connection.baseURL}/models`, {
     headers: { Authorization: `Bearer ${connection.apiKey}` },
     signal: AbortSignal.timeout(10000),
@@ -255,7 +255,7 @@ function createBridge({ ai, createSdk, directory, refreshHost = async () => {}, 
       const vision = visionText ? JSON.parse(visionText) : null;
       if (vision && (vision.version !== 1 || typeof vision.model !== "string" ||
         !vision.model.includes("/") || /[\s\u0000-\u001f]/u.test(vision.model) || vision.model.includes("::"))) {
-        throw new Error("视觉模型无效，请在 Eagle「Magpie 桥接」面板重新选择。");
+        throw new Error("视觉模型无效，请在 Eagle「magpie-agent-eagle」面板重新选择。");
       }
       desired.chat = desired.model;
       desired.vision = vision?.model ?? desired.model;
@@ -274,7 +274,7 @@ function createBridge({ ai, createSdk, directory, refreshHost = async () => {}, 
     async setVision(model) {
       if (stopped) throw new Error("同步已暂停，请先点击重新同步。");
       if (running) throw new Error("正在同步，请稍后重试。");
-      if (!readConnection(connectionFile)) throw new Error("请先在 Magpie 的 Eagle 条目选择语言模型。");
+      if (!readConnection(connectionFile)) throw new Error("请先在 Magpie 的 magpie-agent-eagle 条目选择语言模型。");
       ai.reload();
       await flushSdk();
       if (state) assertOwned();

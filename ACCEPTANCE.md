@@ -1,6 +1,12 @@
-# Acceptance — 0.3.3
+# Acceptance — 0.3.4
 
 Recorded on 2026-11-11 (Asia/Shanghai).
+
+Version 0.3.4 renames the Magpie plugin, Agent display name and Eagle companion
+to `magpie-agent-eagle`. The Agent ID `eagle`, Eagle plugin ID
+`zeezhi-magpie-bridge` and local data paths remain unchanged. Earlier live UI
+records below use the names displayed by those versions; GUI rename acceptance
+has not been repeated.
 
 ## Verified
 

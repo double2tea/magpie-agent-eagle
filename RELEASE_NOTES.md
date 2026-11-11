@@ -1,8 +1,10 @@
-# Eagle × Magpie v0.3.3
+# magpie-agent-eagle v0.3.4
 
-修复首次连接后视觉列表不刷新的问题，完善新用户安装说明。
+将 Magpie 插件、Agent 条目及 Eagle 配套插件的显示名称统一为 `magpie-agent-eagle`。
+保留原 Agent ID、Eagle 插件 ID 和配置目录，已有连接数据继续使用。
+Eagle 安装包更名为 `magpie-agent-eagle-0.3.4.eagleplugin`。
 
-- 在 Magpie 的 Eagle 条目选择语言模型，在 Eagle 桥接面板从 Magpie 的图片模型目录选择视觉模型。
+- 在 Magpie 的 magpie-agent-eagle 条目选择语言模型，在 Eagle 同名面板从 Magpie 的图片模型目录选择视觉模型。
 - 等待官方 AI 模型套件就绪后自动连接；写入后刷新官方缓存并读回核对两个默认模型。
 - 定向修复启动时视觉模型被重置为原语言模型的问题；其他受管理配置冲突继续停止同步和恢复。
 - 连接成功后自动加载视觉模型列表；先打开面板、后连接 Magpie 时无需再手动重新同步。
@@ -12,16 +14,16 @@
 
 ## 安装
 
-下载并在 Eagle 安装 `Eagle-Magpie-Bridge-0.3.3.eagleplugin`，启用官方 AI 模型套件 1.0.0，然后在 Magpie 添加此仓库：
+下载并在 Eagle 安装 `magpie-agent-eagle-0.3.4.eagleplugin`，启用官方 AI 模型套件 1.0.0，然后在 Magpie 添加此仓库：
 
 ```sh
 magpie plugin add github:double2tea/magpie-agent-eagle
 ```
 
-`magpie-agent-eagle-0.3.3.tgz` 为 Magpie 插件包；`SHA256SUMS.txt` 提供两个安装包的校验值。
+`magpie-agent-eagle-0.3.4.tgz` 为 Magpie 插件包；`SHA256SUMS.txt` 提供两个安装包的校验值。
 
 已有用户更新 Eagle 同一插件后重新启动 Eagle；Magpie 端通过其插件管理器更新。
-语言模型在 Magpie 的 Eagle 条目修改，视觉模型在 Eagle「Magpie 桥接」修改。
+语言模型在 Magpie 的 magpie-agent-eagle 条目修改，视觉模型在 Eagle「magpie-agent-eagle」修改。
 
 ## 已知边界
 

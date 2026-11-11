@@ -1,9 +1,9 @@
 {
   "id": "zeezhi-magpie-bridge",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "platform": "mac",
   "arch": "all",
-  "name": "Magpie 桥接",
+  "name": "magpie-agent-eagle",
   "description": "接收 Magpie 的语言与视觉模型，管理 Eagle AI 模型套件并恢复原设置。",
   "logo": "/logo.png",
   "keywords": ["Magpie", "AI", "模型"],

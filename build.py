@@ -12,7 +12,7 @@ def main():
     manifest = json.loads((ROOT / "eagle/manifest.json").read_text())
     assert (ROOT / "eagle/logo.png").is_file()
     notices = ["LICENSE", "THIRD_PARTY_NOTICES.md"]
-    package = DIST / f"Eagle-Magpie-Bridge-{manifest['version']}.eagleplugin"
+    package = DIST / f"magpie-agent-eagle-{manifest['version']}.eagleplugin"
     with zipfile.ZipFile(package, "w", zipfile.ZIP_DEFLATED) as archive:
         for file in sorted((ROOT / "eagle").iterdir()):
             assert file.is_file(), f"Unexpected directory in Eagle runtime: {file}"
